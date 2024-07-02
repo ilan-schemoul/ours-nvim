@@ -10,7 +10,7 @@ return {
     local Job = require("plenary.job")
     local rebase_merge = false
     local rebase_apply = false
-    local last_updated_ns = 0
+    local last_updated_ns = vim.loop.hrtime()
 
     local theme = {
       current = { fg = "#cad3f5", bg = "transparent", style = "bold" },
@@ -37,9 +37,10 @@ return {
 
     local function update_git_state_async(tab_nr)
       local current_ns = vim.loop.hrtime()
-      local one_second = 1000 * 1000 * 1000
+      local one_second = 1000000000
+      local delta_in_seconds = (current_ns - last_updated_ns) / one_second
 
-      if last_updated_ns - current_ns > one_second / 10 then
+      if delta_in_seconds < 0.5 then
         return
       end
 
